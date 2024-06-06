@@ -52,7 +52,7 @@ namespace Chatterino.Controls
 
             contextMenu.MenuItems.Add("Send and Keep Message", (s, e) => { (App.MainForm.Selected as ChatControl)?.SendMessage(false); });
         }
-        
+
         public ChatInputControl(ChatControl chatControl)
         {
             Size = new Size(100, 100);
@@ -199,23 +199,26 @@ namespace Chatterino.Controls
                 }
             }
 
-            end:
+        end:
             return position;
         }
-        
+
         protected override void OnMouseDoubleClick(MouseEventArgs e)
         {
             base.OnMouseDoubleClick(e);
             var g = App.UseDirectX ? null : CreateGraphics();
             Message msg = Logic.Message;
             Word word = msg.WordAtPoint(new CommonPoint(e.X - messagePadding.Left, e.Y - messagePadding.Top));
-            MessagePosition position = msg.MessagePositionAtPoint(g, new CommonPoint(word.X + 1, e.Y), 0);
-            MessagePosition position2 = msg.MessagePositionAtPoint(g, new CommonPoint((word.X + 1 + word.Width), e.Y), 0);
-            Logic.SelectionStart = getIndexFromMessagePosition(position);
-            Logic.SetSelectionEnd(getIndexFromMessagePosition(position2));
+            if (word != null)
+            {
+                MessagePosition position = msg.MessagePositionAtPoint(g, new CommonPoint(word.X + 1, e.Y), 0);
+                MessagePosition position2 = msg.MessagePositionAtPoint(g, new CommonPoint((word.X + 1 + word.Width), e.Y), 0);
+                Logic.SelectionStart = getIndexFromMessagePosition(position);
+                Logic.SetSelectionEnd(getIndexFromMessagePosition(position2));
+            }
             g?.Dispose();
         }
-        
+
         protected override void OnMouseDown(MouseEventArgs e)
         {
             var g = App.UseDirectX ? null : CreateGraphics();
@@ -228,7 +231,7 @@ namespace Chatterino.Controls
                 {
                     Logic.SetSelectionEnd(Logic.SelectionStart = getIndexFromMessagePosition(Logic.Message.MessagePositionAtPoint(g, new CommonPoint(e.X - messagePadding.Left, e.Y - messagePadding.Top), 0)));
                 }
-                
+
             }
 
             g?.Dispose();
@@ -272,7 +275,7 @@ namespace Chatterino.Controls
                 msg.CalculateBounds(g, Width - messagePadding.Left - messagePadding.Right - 20, true);
 
                 g?.Dispose();
-                
+
                 minHeight = GuiEngine.Current.MeasureStringSize(g, FontType.Medium, "X").Height + 8 + messagePadding.Top + messagePadding.Bottom;
                 Height = Math.Max(msg.Height + messagePadding.Top + messagePadding.Bottom, minHeight);
             }
@@ -363,7 +366,7 @@ namespace Chatterino.Controls
                     var _lastSegment = _word.SplitSegments?[_word.SplitSegments.Length - 1].Item2;
                     caretRect = _word.SplitSegments == null ? new Rectangle(messagePadding.Left + _word.X + _word.Width, _word.Y + messagePadding.Top, 1, _word.Height) : new Rectangle(messagePadding.Left + _lastSegment.Value.X + GuiEngine.Current.MeasureStringSize(App.UseDirectX ? null : g, _word.Font, _lastSegmentText).Width, _lastSegment.Value.Y + messagePadding.Top, 1, _lastSegment.Value.Height);
 
-                    end:
+                end:
 
                     if (caretRect != null)
                         g.FillRectangle(App.ColorScheme.TextCaret, caretRect.Value);

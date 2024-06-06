@@ -10,9 +10,9 @@ namespace Chatterino.Controls
     public class EmoteList : MessageContainerControl
     {
         private List<Message> _messages = new List<Message>();
-        
+
         public HashSet<LazyLoadedImage> GifEmotes = new HashSet<LazyLoadedImage>();
-        
+
         public bool show_only_channel_emotes;
 
         protected override Message[] Messages
@@ -30,15 +30,19 @@ namespace Chatterino.Controls
             AllowMessageSeperator = false;
             EnableHatEmotes = false;
         }
-        
-        private void addGifEmote(LazyLoadedImage emote) {
-            lock (GifEmotes) {
+
+        private void addGifEmote(LazyLoadedImage emote)
+        {
+            lock (GifEmotes)
+            {
                 GifEmotes.Add(emote);
             }
         }
-        
-        private void clearGifEmotes() {
-            lock (GifEmotes) {
+
+        private void clearGifEmotes()
+        {
+            lock (GifEmotes)
+            {
                 GifEmotes.Clear();
             }
         }
@@ -47,26 +51,34 @@ namespace Chatterino.Controls
         {
             Task.Run(() =>
             {
-                try {
+                try
+                {
                     lock (MessageLock)
                     {
                         var messages = _messages;
                         LazyLoadedImage twitchemote;
                         messages.Clear();
                         clearGifEmotes();
-                        
-                        if (!show_only_channel_emotes) {
+
+                        if (!show_only_channel_emotes)
+                        {
                             // recently used emotes
-                            if (AppSettings.RecentlyUsedEmoteList) {
+                            if (AppSettings.RecentlyUsedEmoteList)
+                            {
                                 var words = new List<Word>();
 
                                 foreach (var emote in Emotes.RecentlyUsedEmotes.Values)
                                 {
-                                    if (emote.IsAnimated) {
+                                    if (emote.IsAnimated)
+                                    {
                                         addGifEmote(emote);
-                                    } else if (emote.Image==null) {
-                                        emote.ImageLoaded += (s, e) => {
-                                            if (emote.IsAnimated) {
+                                    }
+                                    else if (emote.Image == null)
+                                    {
+                                        emote.ImageLoaded += (s, e) =>
+                                        {
+                                            if (emote.IsAnimated)
+                                            {
                                                 addGifEmote(emote);
                                             }
                                         };
@@ -90,11 +102,16 @@ namespace Chatterino.Controls
                                     foreach (var emote in emotes.OrderBy(x => x.Key))
                                     {
                                         twitchemote = Emotes.GetTwitchEmoteById(emote.Value.ID, emote.Key);
-                                        if (twitchemote.IsAnimated) {
+                                        if (twitchemote.IsAnimated)
+                                        {
                                             addGifEmote(twitchemote);
-                                        } else if (twitchemote.Image==null) {
-                                            twitchemote.ImageLoaded += (s, e) => {
-                                                if (twitchemote.IsAnimated) {
+                                        }
+                                        else if (twitchemote.Image == null)
+                                        {
+                                            twitchemote.ImageLoaded += (s, e) =>
+                                            {
+                                                if (twitchemote.IsAnimated)
+                                                {
                                                     addGifEmote(twitchemote);
                                                 }
                                             };
@@ -119,16 +136,22 @@ namespace Chatterino.Controls
                             }
 
                             // Follower emotes
-                            if (channel != null && channel.IsFollowing) {
+                            if (channel != null && channel.IsFollowing)
+                            {
                                 var words = new List<Word>();
 
                                 foreach (var emote in channel.FollowerEmotes.Values)
                                 {
-                                    if (emote.IsAnimated) {
+                                    if (emote.IsAnimated)
+                                    {
                                         addGifEmote(emote);
-                                    } else if (emote.Image==null) {
-                                        emote.ImageLoaded += (s, e) => {
-                                            if (emote.IsAnimated) {
+                                    }
+                                    else if (emote.Image == null)
+                                    {
+                                        emote.ImageLoaded += (s, e) =>
+                                        {
+                                            if (emote.IsAnimated)
+                                            {
                                                 addGifEmote(emote);
                                             }
                                         };
@@ -142,7 +165,7 @@ namespace Chatterino.Controls
                                     messages.Add(new Message(words));
                                 }
                             }
-                            
+
                             // bttv channel emotes
                             if (channel != null)
                             {
@@ -150,11 +173,16 @@ namespace Chatterino.Controls
 
                                 foreach (var emote in channel.BttvChannelEmotes.Values)
                                 {
-                                    if (emote.IsAnimated) {
+                                    if (emote.IsAnimated)
+                                    {
                                         addGifEmote(emote);
-                                    } else if (emote.Image==null) {
-                                        emote.ImageLoaded += (s, e) => {
-                                            if (emote.IsAnimated) {
+                                    }
+                                    else if (emote.Image == null)
+                                    {
+                                        emote.ImageLoaded += (s, e) =>
+                                        {
+                                            if (emote.IsAnimated)
+                                            {
                                                 addGifEmote(emote);
                                             }
                                         };
@@ -175,11 +203,16 @@ namespace Chatterino.Controls
 
                                 foreach (var emote in Emotes.BttvGlobalEmotes.Values)
                                 {
-                                    if (emote.IsAnimated) {
+                                    if (emote.IsAnimated)
+                                    {
                                         addGifEmote(emote);
-                                    } else if (emote.Image==null) {
-                                        emote.ImageLoaded += (s, e) => {
-                                            if (emote.IsAnimated) {
+                                    }
+                                    else if (emote.Image == null)
+                                    {
+                                        emote.ImageLoaded += (s, e) =>
+                                        {
+                                            if (emote.IsAnimated)
+                                            {
                                                 addGifEmote(emote);
                                             }
                                         };
@@ -201,11 +234,16 @@ namespace Chatterino.Controls
 
                                 foreach (var emote in channel.FfzChannelEmotes.Values)
                                 {
-                                    if (emote.IsAnimated) {
+                                    if (emote.IsAnimated)
+                                    {
                                         addGifEmote(emote);
-                                    } else if (emote.Image==null) {
-                                        emote.ImageLoaded += (s, e) => {
-                                            if (emote.IsAnimated) {
+                                    }
+                                    else if (emote.Image == null)
+                                    {
+                                        emote.ImageLoaded += (s, e) =>
+                                        {
+                                            if (emote.IsAnimated)
+                                            {
                                                 addGifEmote(emote);
                                             }
                                         };
@@ -226,11 +264,16 @@ namespace Chatterino.Controls
 
                                 foreach (var emote in Emotes.FfzGlobalEmotes.Values)
                                 {
-                                    if (emote.IsAnimated) {
+                                    if (emote.IsAnimated)
+                                    {
                                         addGifEmote(emote);
-                                    } else if (emote.Image==null) {
-                                        emote.ImageLoaded += (s, e) => {
-                                            if (emote.IsAnimated) {
+                                    }
+                                    else if (emote.Image == null)
+                                    {
+                                        emote.ImageLoaded += (s, e) =>
+                                        {
+                                            if (emote.IsAnimated)
+                                            {
                                                 addGifEmote(emote);
                                             }
                                         };
@@ -244,43 +287,56 @@ namespace Chatterino.Controls
                                     messages.Add(new Message(words));
                                 }
                             }
-                            
-                             // 7tv channel emotes
+
+                            // 7tv channel emotes
                             {
-                                var words = new List<Word>();
-
-                                foreach (var emote in channel.SeventvChannelEmotes.Values)
+                                if (channel != null)
                                 {
-                                    if (emote.IsAnimated) {
-                                        addGifEmote(emote);
-                                    } else if (emote.Image==null) {
-                                        emote.ImageLoaded += (s, e) => {
-                                            if (emote.IsAnimated) {
-                                                addGifEmote(emote);
-                                            }
-                                        };
+                                    var words = new List<Word>();
+
+                                    foreach (var emote in channel.SeventvChannelEmotes.Values)
+                                    {
+                                        if (emote.IsAnimated)
+                                        {
+                                            addGifEmote(emote);
+                                        }
+                                        else if (emote.Image == null)
+                                        {
+                                            emote.ImageLoaded += (s, e) =>
+                                            {
+                                                if (emote.IsAnimated)
+                                                {
+                                                    addGifEmote(emote);
+                                                }
+                                            };
+                                        }
+                                        words.Add(new Word { Type = SpanType.LazyLoadedImage, Value = emote, Tooltip = emote.Tooltip, TooltipImageUrl = emote.TooltipImageUrl, CopyText = emote.Name, Link = new Link(LinkType.InsertText, emote.Name + " ") });
                                     }
-                                    words.Add(new Word { Type = SpanType.LazyLoadedImage, Value = emote, Tooltip = emote.Tooltip, TooltipImageUrl = emote.TooltipImageUrl, CopyText = emote.Name, Link = new Link(LinkType.InsertText, emote.Name + " ") });
-                                }
 
-                                if (words.Count != 0)
-                                {
-                                    messages.Add(new Message("7tv Channel Emotes"));
-                                    messages.Add(new Message(words));
+                                    if (words.Count != 0)
+                                    {
+                                        messages.Add(new Message("7tv Channel Emotes"));
+                                        messages.Add(new Message(words));
+                                    }
                                 }
                             }
-                            
+
                             // 7tv global emotes
                             {
                                 var words = new List<Word>();
 
                                 foreach (var emote in Emotes.SeventvGlobalEmotes.Values)
                                 {
-                                    if (emote.IsAnimated) {
+                                    if (emote.IsAnimated)
+                                    {
                                         addGifEmote(emote);
-                                    } else if (emote.Image==null) {
-                                        emote.ImageLoaded += (s, e) => {
-                                            if (emote.IsAnimated) {
+                                    }
+                                    else if (emote.Image == null)
+                                    {
+                                        emote.ImageLoaded += (s, e) =>
+                                        {
+                                            if (emote.IsAnimated)
+                                            {
                                                 addGifEmote(emote);
                                             }
                                         };
@@ -294,18 +350,26 @@ namespace Chatterino.Controls
                                     messages.Add(new Message(words));
                                 }
                             }
-                        } else {
+                        }
+                        else
+                        {
                             // Follower emotes
-                            if (channel != null) {
+                            if (channel != null)
+                            {
                                 var words = new List<Word>();
 
                                 foreach (var emote in channel.FollowerEmotes.Values)
                                 {
-                                    if (emote.IsAnimated) {
+                                    if (emote.IsAnimated)
+                                    {
                                         addGifEmote(emote);
-                                    } else if (emote.Image==null) {
-                                        emote.ImageLoaded += (s, e) => {
-                                            if (emote.IsAnimated) {
+                                    }
+                                    else if (emote.Image == null)
+                                    {
+                                        emote.ImageLoaded += (s, e) =>
+                                        {
+                                            if (emote.IsAnimated)
+                                            {
                                                 addGifEmote(emote);
                                             }
                                         };
@@ -319,22 +383,28 @@ namespace Chatterino.Controls
                                     messages.Add(new Message(words));
                                 }
                             }
-                            
+
                             // Channel emotes
-                            if (channel != null) {
+                            if (channel != null)
+                            {
                                 LazyLoadedImage emote;
-                                foreach (var emotes in channel.ChannelEmotes.OrderBy(x => x.Value.EmoteInfo.type).ThenBy(x => x.Value.EmoteInfo.tier).GroupBy(x => new {x.Value.EmoteInfo.type, x.Value.EmoteInfo.tier}))
+                                foreach (var emotes in channel.ChannelEmotes.OrderBy(x => x.Value.EmoteInfo.type).ThenBy(x => x.Value.EmoteInfo.tier).GroupBy(x => new { x.Value.EmoteInfo.type, x.Value.EmoteInfo.tier }))
                                 {
                                     var words = new List<Word>();
 
                                     foreach (var emotepair in emotes.OrderBy(x => x.Value.Name))
                                     {
                                         emote = emotepair.Value;
-                                        if (emote.IsAnimated) {
+                                        if (emote.IsAnimated)
+                                        {
                                             addGifEmote(emote);
-                                        } else if (emote.Image==null) {
-                                            emote.ImageLoaded += (s, e) => {
-                                                if (emote.IsAnimated) {
+                                        }
+                                        else if (emote.Image == null)
+                                        {
+                                            emote.ImageLoaded += (s, e) =>
+                                            {
+                                                if (emote.IsAnimated)
+                                                {
                                                     addGifEmote(emote);
                                                 }
                                             };
@@ -344,28 +414,37 @@ namespace Chatterino.Controls
 
                                     if (words.Count != 0)
                                     {
-                                        if (((LazyLoadedImage)(words[0].Value)).EmoteInfo.type.Equals("bitstier")) {
+                                        if (((LazyLoadedImage)(words[0].Value)).EmoteInfo.type.Equals("bitstier"))
+                                        {
                                             messages.Add(new Message("Bit Emotes"));
-                                        } else if (((LazyLoadedImage)(words[0].Value)).EmoteInfo.type.Equals("subscriptions") && ((LazyLoadedImage)(words[0].Value)).EmoteInfo.tier.Equals("1000")){
+                                        }
+                                        else if (((LazyLoadedImage)(words[0].Value)).EmoteInfo.type.Equals("subscriptions") && ((LazyLoadedImage)(words[0].Value)).EmoteInfo.tier.Equals("1000"))
+                                        {
                                             messages.Add(new Message("Tier 1 Emotes"));
-                                        } else if (((LazyLoadedImage)(words[0].Value)).EmoteInfo.type.Equals("subscriptions") && ((LazyLoadedImage)(words[0].Value)).EmoteInfo.tier.Equals("2000")){
+                                        }
+                                        else if (((LazyLoadedImage)(words[0].Value)).EmoteInfo.type.Equals("subscriptions") && ((LazyLoadedImage)(words[0].Value)).EmoteInfo.tier.Equals("2000"))
+                                        {
                                             messages.Add(new Message("Tier 2 Emotes"));
-                                        } else if (((LazyLoadedImage)(words[0].Value)).EmoteInfo.type.Equals("subscriptions") && ((LazyLoadedImage)(words[0].Value)).EmoteInfo.tier.Equals("3000")){
+                                        }
+                                        else if (((LazyLoadedImage)(words[0].Value)).EmoteInfo.type.Equals("subscriptions") && ((LazyLoadedImage)(words[0].Value)).EmoteInfo.tier.Equals("3000"))
+                                        {
                                             messages.Add(new Message("Tier 3 Emotes"));
                                         }
                                         messages.Add(new Message(words));
                                     }
                                 }
                             }
-                            
+
                         }
                     }
                     scrollAtBottom = false;
                     _scroll.Value = 0;
                     updateMessageBounds();
                     Invalidate();
-                } catch (Exception e) {
-                    GuiEngine.Current.log("Error loading emotelist " +e.ToString());
+                }
+                catch (Exception e)
+                {
+                    GuiEngine.Current.log("Error loading emotelist " + e.ToString());
                 }
             });
         }
