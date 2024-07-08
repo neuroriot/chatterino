@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -965,9 +966,20 @@ namespace Chatterino.Common
                                         {
                                             int.TryParse(duration, out iduration);
                                         }
-                                        message = new Message(
-                                            $"{msg.Params} was timed out for {iduration} second{(iduration != 1 ? "s" : "")}",
-                                            HSLColor.Gray, true);
+
+                                        if (iduration == 0) {
+                                            //is Ban
+                                            message = new Message(
+                                                $"{msg.Params} has been permanently banned.",
+                                                HSLColor.DarkRed, true);
+                                        }
+                                        else
+                                        {
+                                            message = new Message(
+                                                $"{msg.Params} was timed out for {iduration} second{(iduration != 1 ? "s" : "")}",
+                                                HSLColor.Gray, true);
+                                        }
+
                                         messages.Add(message);
                                     } else if (msg.Command == "CLEARMSG" && !string.IsNullOrWhiteSpace(msg.Params)) {
                                         msg.Tags.TryGetValue("target-msg-id", out string msgId);
@@ -1618,11 +1630,22 @@ namespace Chatterino.Common
                     {
                         if (m.TimeoutUser != user) continue;
 
-                        i.Value =
-                            new Message(
-                                $"{user} was timed out for {duration} second{(duration != 1 ? "s" : "")} (multiple times)",
-                                HSLColor.Gray, true)
+                        if (duration == 0)
+                        {
+                            //is Ban
+                            i.Value = new Message(
+                                $"{user} has been permanently banned.", HSLColor.DarkRed, true)
                             { TimeoutUser = user, Id = m.Id };
+                        }
+                        else
+                        {
+                            i.Value =
+                                new Message(
+                                    $"{user} was timed out for {duration} second{(duration != 1 ? "s" : "")} (multiple times)",
+                                    HSLColor.Gray, true)
+                                { TimeoutUser = user, Id = m.Id };
+                        }
+
                         Monitor.Exit(MessageLock);
 
                         ChatCleared?.Invoke(this, new ChatClearedEventArgs(user, reason, duration));
@@ -1635,10 +1658,19 @@ namespace Chatterino.Common
 
             Monitor.Exit(MessageLock);
 
-            AddMessage(
+            //is Ban
+            if (duration == 0)
+            {
+                AddMessage(new Message($"{user} has been permanently banned.", HSLColor.DarkRed, true)
+                { TimeoutUser = user });
+            }
+            else
+            {
+                AddMessage(
                 new Message($"{user} was timed out for {duration} second{(duration != 1 ? "s" : "")}",
                     HSLColor.Gray, true)
                 { TimeoutUser = user });
+            }
 
             ChatCleared?.Invoke(this, new ChatClearedEventArgs(user, reason, duration));
         }
