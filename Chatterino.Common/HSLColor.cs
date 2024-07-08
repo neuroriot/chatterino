@@ -11,6 +11,8 @@ namespace Chatterino.Common
         public static readonly HSLColor Blue = new HSLColor(.5f, 1f, 0.42f);
         public static readonly HSLColor Orange = new HSLColor(.111f, 1f, 0.55f);
 
+        public static readonly HSLColor DarkRed = new HSLColor(0.0f, .33f, 0.14f);
+
         private float hue;
 
         public float Hue

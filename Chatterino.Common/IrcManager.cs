@@ -22,7 +22,10 @@ namespace Chatterino.Common
             "channel:edit:commercial+channel:manage:vips+channel:manage:moderators+moderator:manage:announcements+" +
             "moderator:manage:chat_messages+channel:manage:raids+moderator:manage:chat_settings+user:manage:chat_color+" +
             "channel:manage:broadcast+channel:manage:predictions+user:write:chat";
+
+
         public static IrcClient Client { get; set; }
+
         public static string LastReceivedWhisperUser { get; set; }
         public static IEnumerable<string> IgnoredUsers => AppSettings.IgnoreViaTwitch ? twitchBlockedUsers.Keys : AppSettings.IgnoredUsers.Keys;
 
@@ -138,6 +141,13 @@ namespace Chatterino.Common
             //LoadEmotesFromApi();
             if (loadEmotes == false)
             {
+                // if client is null... todo: wait until connection is established, then continue?
+                if (Client == null)
+                {
+                    GuiEngine.Current.log("IrcClient Null Exception - LoadUsersEmotes");
+                    return;
+                }
+
                 loadEmotes = true;
                 bool isalreadyjoined = false;
                 foreach (var channel in TwitchChannel.Channels)

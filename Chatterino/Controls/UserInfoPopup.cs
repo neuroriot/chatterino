@@ -15,6 +15,7 @@ namespace Chatterino.Controls
     public class UserInfoPopup : Form
     {
         private string username;
+        private FlatButton btnUsercard;
         private bool notedialog = false;
 
         public string Username
@@ -185,6 +186,14 @@ namespace Chatterino.Controls
                     Clipboard.SetText(displayName);
                 }
                 catch { }
+            };
+
+            //https://www.twitch.tv/popout/kairos_rev_/viewercard/reginald_campbell
+            btnUsercard.SetTooltip("Show Viewer/User Card");
+            // show profile
+            btnUsercard.Click += (s, e) =>
+            {
+                Common.GuiEngine.Current.HandleLink(new Common.Link(Common.LinkType.Url, $"https://www.twitch.tv/popout/{data.Channel.Name}/viewercard/{data.UserName}" ));
             };
 
             btnCopyUsername.SetTooltip("Copy Username");
@@ -465,8 +474,8 @@ namespace Chatterino.Controls
             this.btnUnmod = new Chatterino.Controls.FlatButton();
             this.btnBan = new Chatterino.Controls.FlatButton();
             this.btnUnban = new Chatterino.Controls.FlatButton();
-            this.btnPurge = new Chatterino.Controls.FlatButton();
             this.btnDelete = new Chatterino.Controls.FlatButton();
+            this.btnPurge = new Chatterino.Controls.FlatButton();
             this.btnTimeout5Min = new Chatterino.Controls.FlatButton();
             this.btnTimeout30Mins = new Chatterino.Controls.FlatButton();
             this.btnTimeout2Hours = new Chatterino.Controls.FlatButton();
@@ -476,6 +485,7 @@ namespace Chatterino.Controls
             this.btnTimeout1Month = new Chatterino.Controls.FlatButton();
             this.btnCopyUsername = new Chatterino.Controls.FlatButton();
             this.btnProfile = new Chatterino.Controls.FlatButton();
+            this.btnUsercard = new Chatterino.Controls.FlatButton();
             this.btnFollow = new Chatterino.Controls.FlatButton();
             this.btnIgnore = new Chatterino.Controls.FlatButton();
             this.btnIgnoreHighlights = new Chatterino.Controls.FlatButton();
@@ -509,6 +519,7 @@ namespace Chatterino.Controls
             this.flowLayoutPanel1.Controls.Add(this.btnTimeout1Month);
             this.flowLayoutPanel1.Controls.Add(this.btnCopyUsername);
             this.flowLayoutPanel1.Controls.Add(this.btnProfile);
+            this.flowLayoutPanel1.Controls.Add(this.btnUsercard);
             this.flowLayoutPanel1.Controls.Add(this.btnFollow);
             this.flowLayoutPanel1.Controls.Add(this.btnIgnore);
             this.flowLayoutPanel1.Controls.Add(this.btnIgnoreHighlights);
@@ -520,7 +531,7 @@ namespace Chatterino.Controls
             this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Padding = new System.Windows.Forms.Padding(8);
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(284, 261);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(332, 261);
             this.flowLayoutPanel1.TabIndex = 0;
             // 
             // picAvatar
@@ -544,7 +555,7 @@ namespace Chatterino.Controls
             this.flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowLayoutPanel2.Location = new System.Drawing.Point(81, 11);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(61, 39);
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(61, 52);
             this.flowLayoutPanel2.TabIndex = 12;
             // 
             // lblUsername
@@ -570,7 +581,7 @@ namespace Chatterino.Controls
             this.lblNotes.AutoSize = true;
             this.lblNotes.Location = new System.Drawing.Point(3, 26);
             this.lblNotes.Name = "lblNotes";
-            this.lblNotes.Size = new System.Drawing.Size(34, 13);
+            this.lblNotes.Size = new System.Drawing.Size(33, 13);
             this.lblNotes.TabIndex = 1;
             this.lblNotes.Text = "notes";
             // 
@@ -612,7 +623,6 @@ namespace Chatterino.Controls
             // 
             // btnUnban
             // 
-            
             this.btnUnban.Image = null;
             this.btnUnban.Location = new System.Drawing.Point(145, 81);
             this.btnUnban.Name = "btnUnban";
@@ -624,9 +634,9 @@ namespace Chatterino.Controls
             // 
             this.flowLayoutPanel1.SetFlowBreak(this.btnDelete, true);
             this.btnDelete.Image = null;
-            this.btnDelete.Location = new System.Drawing.Point(184, 81);
+            this.btnDelete.Location = new System.Drawing.Point(197, 81);
             this.btnDelete.Name = "btnDelete";
-            this.btnDelete.Size = new System.Drawing.Size(42, 18);
+            this.btnDelete.Size = new System.Drawing.Size(45, 18);
             this.btnDelete.TabIndex = 10;
             this.btnDelete.Text = "Delete";
             // 
@@ -678,7 +688,7 @@ namespace Chatterino.Controls
             // btnTimeout3Days
             // 
             this.btnTimeout3Days.Image = null;
-            this.btnTimeout3Days.Location = new System.Drawing.Point(11, 129);
+            this.btnTimeout3Days.Location = new System.Drawing.Point(251, 105);
             this.btnTimeout3Days.Name = "btnTimeout3Days";
             this.btnTimeout3Days.Size = new System.Drawing.Size(40, 18);
             this.btnTimeout3Days.TabIndex = 17;
@@ -687,7 +697,7 @@ namespace Chatterino.Controls
             // btnTimeout7Days
             // 
             this.btnTimeout7Days.Image = null;
-            this.btnTimeout7Days.Location = new System.Drawing.Point(57, 129);
+            this.btnTimeout7Days.Location = new System.Drawing.Point(11, 129);
             this.btnTimeout7Days.Name = "btnTimeout7Days";
             this.btnTimeout7Days.Size = new System.Drawing.Size(40, 18);
             this.btnTimeout7Days.TabIndex = 18;
@@ -697,7 +707,7 @@ namespace Chatterino.Controls
             // 
             this.flowLayoutPanel1.SetFlowBreak(this.btnTimeout1Month, true);
             this.btnTimeout1Month.Image = null;
-            this.btnTimeout1Month.Location = new System.Drawing.Point(103, 129);
+            this.btnTimeout1Month.Location = new System.Drawing.Point(57, 129);
             this.btnTimeout1Month.Name = "btnTimeout1Month";
             this.btnTimeout1Month.Size = new System.Drawing.Size(52, 18);
             this.btnTimeout1Month.TabIndex = 19;
@@ -709,7 +719,9 @@ namespace Chatterino.Controls
             this.btnCopyUsername.Location = new System.Drawing.Point(11, 153);
             this.btnCopyUsername.Name = "btnCopyUsername";
             this.btnCopyUsername.Size = new System.Drawing.Size(24, 23);
+            //this.btnCopyUsername.Padding = new System.Windows.Forms.Padding(0,3,3,6);
             this.btnCopyUsername.TabIndex = 1;
+            //this.btnCopyUsername.Text = "📋";
             // 
             // btnProfile
             // 
@@ -720,19 +732,28 @@ namespace Chatterino.Controls
             this.btnProfile.TabIndex = 8;
             this.btnProfile.Text = "Profile";
             // 
+            // btnUsercard
+            // 
+            this.btnUsercard.Image = null;
+            this.btnUsercard.Location = new System.Drawing.Point(90, 153);
+            this.btnUsercard.Name = "btnUsercard";
+            this.btnUsercard.Size = new System.Drawing.Size(57, 18);
+            this.btnUsercard.TabIndex = 9;
+            this.btnUsercard.Text = "Usercard";
+            // 
             // btnFollow
             // 
             this.btnFollow.Image = null;
-            this.btnFollow.Location = new System.Drawing.Point(90, 153);
+            this.btnFollow.Location = new System.Drawing.Point(153, 153);
             this.btnFollow.Name = "btnFollow";
             this.btnFollow.Size = new System.Drawing.Size(44, 18);
-            this.btnFollow.TabIndex = 9;
+            this.btnFollow.TabIndex = 10;
             this.btnFollow.Text = "Follow";
             // 
             // btnIgnore
             // 
             this.btnIgnore.Image = null;
-            this.btnIgnore.Location = new System.Drawing.Point(140, 153);
+            this.btnIgnore.Location = new System.Drawing.Point(203, 153);
             this.btnIgnore.Name = "btnIgnore";
             this.btnIgnore.Size = new System.Drawing.Size(44, 18);
             this.btnIgnore.TabIndex = 2;
@@ -741,7 +762,7 @@ namespace Chatterino.Controls
             // btnIgnoreHighlights
             // 
             this.btnIgnoreHighlights.Image = null;
-            this.btnIgnoreHighlights.Location = new System.Drawing.Point(11, 182);
+            this.btnIgnoreHighlights.Location = new System.Drawing.Point(11, 177);
             this.btnIgnoreHighlights.Name = "btnIgnoreHighlights";
             this.btnIgnoreHighlights.Size = new System.Drawing.Size(98, 18);
             this.btnIgnoreHighlights.TabIndex = 21;
@@ -750,7 +771,7 @@ namespace Chatterino.Controls
             // btnWhisper
             // 
             this.btnWhisper.Image = null;
-            this.btnWhisper.Location = new System.Drawing.Point(115, 182);
+            this.btnWhisper.Location = new System.Drawing.Point(115, 177);
             this.btnWhisper.Name = "btnWhisper";
             this.btnWhisper.Size = new System.Drawing.Size(53, 18);
             this.btnWhisper.TabIndex = 6;
@@ -760,7 +781,7 @@ namespace Chatterino.Controls
             // btnMessage
             // 
             this.btnMessage.Image = null;
-            this.btnMessage.Location = new System.Drawing.Point(174, 182);
+            this.btnMessage.Location = new System.Drawing.Point(174, 177);
             this.btnMessage.Name = "btnMessage";
             this.btnMessage.Size = new System.Drawing.Size(57, 18);
             this.btnMessage.TabIndex = 7;
@@ -769,18 +790,18 @@ namespace Chatterino.Controls
             // btnReply
             // 
             this.btnReply.Image = null;
-            this.btnReply.Location = new System.Drawing.Point(174, 182);
+            this.btnReply.Location = new System.Drawing.Point(237, 177);
             this.btnReply.Name = "btnReply";
-            this.btnReply.Size = new System.Drawing.Size(57, 18);
+            this.btnReply.Size = new System.Drawing.Size(41, 18);
             this.btnReply.TabIndex = 7;
             this.btnReply.Text = "Reply";
             // 
             // btnNotes
             // 
             this.btnNotes.Image = null;
-            this.btnNotes.Location = new System.Drawing.Point(174, 182);
+            this.btnNotes.Location = new System.Drawing.Point(11, 201);
             this.btnNotes.Name = "btnNotes";
-            this.btnNotes.Size = new System.Drawing.Size(57, 18);
+            this.btnNotes.Size = new System.Drawing.Size(42, 18);
             this.btnNotes.TabIndex = 7;
             this.btnNotes.Text = "Notes";
             // 
@@ -789,7 +810,7 @@ namespace Chatterino.Controls
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.ClientSize = new System.Drawing.Size(332, 261);
             this.Controls.Add(this.flowLayoutPanel1);
             this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -826,6 +847,7 @@ namespace Chatterino.Controls
         private FlatButton btnReply;
         private FlatButton btnNotes;
         private FlatButton btnProfile;
+
         private FlatButton btnFollow;
         private FlatButton btnPurge;
         private FlatButton btnDelete;

@@ -58,7 +58,7 @@ namespace Chatterino.Controls
 
         public void SetChannel(TwitchChannel channel)
         {
-            Text = (channel == null ? "Global" : (channel.Name + "'" + (channel.Name.EndsWith("s") ? "" : "s"))) + " Emotes - Chatterino";
+            Text = ((channel == null || channel.Name == null) ? "Global" : (channel.Name + "'" + (channel.Name.EndsWith("s") ? "" : "s"))) + " Emotes - Chatterino";
 
             container.LoadChannel(channel);
         }

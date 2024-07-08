@@ -31,12 +31,15 @@ namespace Chatterino.Controls
         private ContextMenu normalContextMenu = new ContextMenu();
         static Link urlContextMenuLink;
 
+        static Message normalMessage;
+        private ContextMenu normalMessageContextMenu = new ContextMenu();
+
         static MessageContainerControl()
         {
             urlContextMenu = new ContextMenu();
             urlContextMenu.MenuItems.Add(new MenuItem("Open in Browser", (s, e) => GuiEngine.Current.HandleLink(urlContextMenuLink)));
             urlContextMenu.MenuItems.Add(new MenuItem("Copy link", (s, e) => Clipboard.SetText(urlContextMenuLink.Value as string ?? "")));
-            
+
         }
 
         protected bool scrollAtBottom = true;
@@ -105,10 +108,22 @@ namespace Chatterino.Controls
 
                 ProposeInvalidation();
             };
-            
-            normalContextMenu.MenuItems.Add("Copy Selection ", (s, e) => { CopySelection(false);});
-            normalContextMenu.MenuItems.Add("Append selection to message", (s, e) => {(App.MainForm.Selected as ChatControl)?.PasteText(GetSelectedText(false));});
-            
+
+
+            normalContextMenu.MenuItems.Add("Copy Selection ", (s, e) => { CopySelection(false); });
+            normalContextMenu.MenuItems.Add("Append selection to message", (s, e) => { (App.MainForm.Selected as ChatControl)?.PasteText(GetSelectedText(false)); });
+
+            // Reply to message
+            normalMessageContextMenu.MenuItems.Add("Reply", (s, e) =>
+            {
+                if (normalMessage != null)
+                    (App.MainForm.Selected as ChatControl)?.Input.Logic.SetText("/reply " + normalMessage?.MessageId + " ");
+                (App.MainForm.Selected as ChatControl)?.Input.Focus();
+                App.MainForm.Focus();
+            });
+            normalMessageContextMenu.MenuItems.Add("Copy Selection ", (s, e) => { CopySelection(false); });
+            normalMessageContextMenu.MenuItems.Add("Append selection to message", (s, e) => { (App.MainForm.Selected as ChatControl)?.PasteText(GetSelectedText(false)); });
+
             Controls.Add(_scroll);
 
             App.GifEmoteFramesUpdated += App_GifEmoteFramesUpdated;
@@ -123,8 +138,10 @@ namespace Chatterino.Controls
 
         public void ClearBuffer()
         {
-            lock (bufferLock) {
-                if (buffer != null) {
+            lock (bufferLock)
+            {
+                if (buffer != null)
+                {
                     buffer.Dispose();
                     buffer = null;
                 }
@@ -132,7 +149,7 @@ namespace Chatterino.Controls
         }
         private void App_GifEmoteFramesUpdated(object s, EventArgs e)
         {
-            
+
             lock (bufferLock)
             {
                 try
@@ -167,7 +184,7 @@ namespace Chatterino.Controls
                 }
                 catch { }
             }
-            
+
         }
 
         private void App_EmoteLoaded(object s, EventArgs e)
@@ -180,11 +197,14 @@ namespace Chatterino.Controls
         // overrides
         protected override void OnMouseWheel(MouseEventArgs e)
         {
-            try {
-                if ((App.MainForm.Selected as ChatControl) != null && (App.MainForm.Selected as ChatControl).AutoCompleteOpen) {
+            try
+            {
+                if ((App.MainForm.Selected as ChatControl) != null && (App.MainForm.Selected as ChatControl).AutoCompleteOpen)
+                {
                     ChatControl.AutoComplete.MouseWheel(e);
                 }
-                else {
+                else
+                {
                     if (_scroll.Enabled)
                     {
                         var scrollDistance = (int)(e.Delta * AppSettings.ScrollMultiplyer);
@@ -284,7 +304,9 @@ namespace Chatterino.Controls
                         ProposeInvalidation();
                     }
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 GuiEngine.Current.log(ex.ToString());
             }
 
@@ -365,7 +387,7 @@ namespace Chatterino.Controls
         {
             base.OnMouseDown(e);
 
-            
+
             mouseDown = true;
 
             leftClick = (e.Button == MouseButtons.Left);
@@ -376,7 +398,8 @@ namespace Chatterino.Controls
             {
                 var graphics = App.UseDirectX ? null : CreateGraphics();
                 MessagePosition position;
-                if (e.Button == MouseButtons.Left) {
+                if (e.Button == MouseButtons.Left)
+                {
                     position = msg.MessagePositionAtPoint(graphics, new CommonPoint(e.X - MessagePadding.Left, e.Y - msg.Y), index);
                     selection = new Selection(position, position);
                 }
@@ -385,7 +408,8 @@ namespace Chatterino.Controls
                 mouseDownWord = word;
                 if (word != null)
                 {
-                    if (e.Button == MouseButtons.Left) {
+                    if (e.Button == MouseButtons.Left)
+                    {
                         position = msg.MessagePositionAtPoint(graphics, new CommonPoint(word.X + 1, e.Y - msg.Y), index);
                         MessagePosition position2 = msg.MessagePositionAtPoint(graphics, new CommonPoint((word.X + 1 + word.Width), e.Y - msg.Y), index);
                         mouseDownSelection = new Selection(position, position2);
@@ -397,7 +421,8 @@ namespace Chatterino.Controls
                 }
                 graphics?.Dispose();
             }
-            else if (e.Button == MouseButtons.Left) {
+            else if (e.Button == MouseButtons.Left)
+            {
                 selection = null;
             }
 
@@ -409,7 +434,8 @@ namespace Chatterino.Controls
             mouseDown = false;
 
             int index;
-            if (e.Button == MouseButtons.Right) {
+            if (e.Button == MouseButtons.Right)
+            {
                 (App.MainForm.Selected as ChatControl)?.CloseAutocomplete();
             }
             var msg = MessageAtPoint(e.Location, out index);
@@ -441,10 +467,27 @@ namespace Chatterino.Controls
                         }
                     }
                 }
+
+                if (e.Button == MouseButtons.Right && mouseDownLink == null)
+                {
+                    if (string.IsNullOrEmpty(msg.MessageId))
+                    {
+                        normalMessage = null;
+                        normalContextMenu.Show(this, e.Location);
+                    }
+                    else {
+                        normalMessage = msg;
+                        normalMessageContextMenu.Show(this, e.Location);
+                    }
+                }
             }
-            
-            if (e.Button == MouseButtons.Right && mouseDownLink == null) {
-                normalContextMenu.Show(this, e.Location);
+            else
+            {
+                normalMessage = null;
+                if (e.Button == MouseButtons.Right && mouseDownLink == null)
+                {
+                    normalContextMenu.Show(this, e.Location);
+                }
             }
 
             mouseDownLink = null;
@@ -459,7 +502,9 @@ namespace Chatterino.Controls
             if (AppSettings.ChatLinksDoubleClickOnly && mouseDownLink != null)
             {
                 GuiEngine.Current.HandleLink(mouseDownLink);
-            } else {
+            }
+            else
+            {
                 //select the word
                 if (mouseDownWord != null && leftClick)
                 {
@@ -518,7 +563,8 @@ namespace Chatterino.Controls
         {
             lock (bufferLock)
             {
-                lock (GuiEngine.Current.GifEmotesLock) {
+                lock (GuiEngine.Current.GifEmotesLock)
+                {
                     try
                     {
                         GifEmotesOnScreen.Clear();
@@ -557,8 +603,8 @@ namespace Chatterino.Controls
                                         var msg = M[i];
                                         var allowMessageSeparator = (!AppSettings.ChatShowLastReadMessageIndicator || i == 0 ||
                                             LastReadMessage != M[i-1]) && AllowMessageSeparator;
-                                        MessageRenderer.DrawMessage(g, msg, MessagePadding.Left, y, 
-                                            selection, i, !App.UseDirectX, GifEmotesOnScreen, 
+                                        MessageRenderer.DrawMessage(g, msg, MessagePadding.Left, y,
+                                            selection, i, !App.UseDirectX, GifEmotesOnScreen,
                                             allowMessageSeperator: allowMessageSeparator);
 
                                         if (y - msg.Height > h)
@@ -568,14 +614,14 @@ namespace Chatterino.Controls
 
                                         y += msg.Height;
 
-                                        if (AppSettings.ChatShowLastReadMessageIndicator && 
+                                        if (AppSettings.ChatShowLastReadMessageIndicator &&
                                             LastReadMessage == msg && i != M.Length - 1)
                                         {
                                             g.FillRectangle(lastReadMessageBrush, 0, y, Width, 1);
                                         }
                                     }
 
-       
+
                                 }
 
                                 if (App.UseDirectX)
@@ -598,7 +644,7 @@ namespace Chatterino.Controls
                                     var brushes = new Dictionary<RawColor4, SCB>();
 
                                     var textColor = App.ColorScheme.Text;
-                                    var textBrush = new SCB(renderTarget, 
+                                    var textBrush = new SCB(renderTarget,
                                         new RawColor4(textColor.R / 255f, textColor.G / 255f, textColor.B / 255f, 1));
 
                                     for (var i = startIndex; i < M.Length; i++)
@@ -671,7 +717,7 @@ namespace Chatterino.Controls
                                                 else
                                                 {
                                                     foreach (var split in word.SplitSegments)
-                                                        renderTarget.DrawText(split.Item1, Fonts.GetTextFormat(word.Font), 
+                                                        renderTarget.DrawText(split.Item1, Fonts.GetTextFormat(word.Font),
                                                             new RawRectangleF(MessagePadding.Left + split.Item2.X, y + split.Item2.Y, 10000, 10000), brush);
                                                 }
                                             }

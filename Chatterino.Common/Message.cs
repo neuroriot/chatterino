@@ -57,6 +57,8 @@ namespace Chatterino.Common
         private static Regex _linkRegex = new Regex(@"^((?<Protocol>\w+):\/\/)?(?<Domain>[\w%@-][\w.%-:@]+\w)\/?[\w\.?=#%&=\+\-@/$,\(\)]*$", RegexOptions.Compiled);
         private static char[] _linkIdentifiers = { '.', ':' };
 
+        private static char[] _strictLinkIdentifiers = { '.', ':' };
+
         public DateTime ParseTime { get; set; }
         private int numberOfMonthsSubbed;
 
@@ -66,15 +68,18 @@ namespace Chatterino.Common
         }
 
         static CultureInfo enUS = new CultureInfo("en-US");
-        
+
         //builds an array of indexes of the elements in string after being converted to utf32
-        private int [] ParseUtf32index (string s) {
+        private int[] ParseUtf32index(string s)
+        {
             List<int> ret = new List<int>(s.Length);
             int curchar;
-            for (int i = 0; i<s.Length; i++) {
+            for (int i = 0; i < s.Length; i++)
+            {
                 curchar = char.ConvertToUtf32(s, i);
                 ret.Add(i);
-                if ( curchar > 0xFFFF ) { //curchar is bigger than a utf 16 char
+                if (curchar > 0xFFFF)
+                { //curchar is bigger than a utf 16 char
                     i++; //skip the second part of curchar
                 }
             }
@@ -107,22 +112,24 @@ namespace Chatterino.Common
                     Username = login;
                 }
             }
-            
+
             if (data.Tags.TryGetValue("user-id", out value))
             {
                 UserId = value;
             }
-            
+
             if (data.Tags.TryGetValue("id", out value))
             {
                 MessageId = value;
             }
 
-            if (data.Tags.TryGetValue("reply-parent-msg-body", out value)) {
+            if (data.Tags.TryGetValue("reply-parent-msg-body", out value))
+            {
                 ReplyBody = value;
             }
 
-            if (data.Tags.TryGetValue("reply-parent-user-login", out value)) {
+            if (data.Tags.TryGetValue("reply-parent-user-login", out value))
+            {
                 ReplyUser = value;
             }
 
@@ -170,9 +177,11 @@ namespace Chatterino.Common
                                     if (AppSettings.ChatEnableHighlightTaskbar)
                                         GuiEngine.Current.FlashTaskbar();
                                 }
-                            } else if (AppSettings.HighlightUserNames != null &&
+                            }
+                            else if (AppSettings.HighlightUserNames != null &&
                             (AppSettings.HighlightUserNames.ContainsKey(Username)
-                            || AppSettings.HighlightUserNames.ContainsKey(DisplayName))) {
+                            || AppSettings.HighlightUserNames.ContainsKey(DisplayName)))
+                            {
                                 if (AppSettings.ChatEnableHighlight)
                                 {
                                     HighlightType = HighlightType.UsernameHighlighted;
@@ -346,7 +355,7 @@ namespace Chatterino.Common
                     }
                 }
             }
-            aftermod:
+        aftermod:
 
             //get number of months subbed
             if (data.Tags.TryGetValue("badge-info", out value))
@@ -410,22 +419,29 @@ namespace Chatterino.Common
             });
 
             var twitchEmotes = new List<Tuple<int, LazyLoadedImage>>();
-            
-            if (data.Tags.TryGetValue("msg-id", out value)) {
-                if (value.Contains("highlighted-message")) {
-                    if (!isPastMessage) {
+
+            if (data.Tags.TryGetValue("msg-id", out value))
+            {
+                if (value.Contains("highlighted-message"))
+                {
+                    if (!isPastMessage)
+                    {
                         Message message;
-                        if (AppSettings.HighlightHighlightedMessages) {
+                        if (AppSettings.HighlightHighlightedMessages)
+                        {
                             message = new Message("Highlighted Message", HSLColor.Gray, true)
                             {
                                 HighlightType = HighlightType.HighlightedMessage
                             };
-                        } else {
+                        }
+                        else
+                        {
                             message = new Message("Highlighted Message", HSLColor.Gray, true);
                         }
                         channel.AddMessage(message);
                     }
-                    if (AppSettings.HighlightHighlightedMessages) {
+                    if (AppSettings.HighlightHighlightedMessages)
+                    {
                         HighlightType = HighlightType.HighlightedMessage;
                     }
                 }
@@ -439,14 +455,16 @@ namespace Chatterino.Common
                     if (emote != "")
                     {
                         string[] x = emote.Split(':');
-                        try {
+                        try
+                        {
                             string id = x[0];
                             foreach (string y in x[1].Split(','))
                             {
                                 string[] coords = y.Split('-');
                                 int[] textElemIndex = ParseUtf32index(text);
                                 int index = int.Parse(coords[0]);
-                                if (textElemIndex.Length>0) {
+                                if (textElemIndex.Length > 0)
+                                {
                                     string name = text.Substring(textElemIndex[index], int.Parse(coords[1]) - index + 1);
 
                                     // ignore ignored emotes
@@ -455,15 +473,18 @@ namespace Chatterino.Common
                                         var e = Emotes.GetTwitchEmoteById(id, name);
 
                                         twitchEmotes.Add(Tuple.Create(index, e));
-                                        
-                                        if (AppSettings.RecentlyUsedEmoteList && Username.Equals(IrcManager.Account.Username.ToLower()) && !channel.FollowerEmotes.ContainsKey(name) && !Emotes.TwitchEmotes.ContainsKey(name) && !Emotes.RecentlyUsedEmotes.ContainsKey(name)) {
+
+                                        if (AppSettings.RecentlyUsedEmoteList && Username.Equals(IrcManager.Account.Username.ToLower()) && !channel.FollowerEmotes.ContainsKey(name) && !Emotes.TwitchEmotes.ContainsKey(name) && !Emotes.RecentlyUsedEmotes.ContainsKey(name))
+                                        {
                                             Emotes.RecentlyUsedEmotes.TryAdd(name, e);
                                             Emotes.EmoteAdded();
                                         }
                                     }
                                 }
                             };
-                        } catch(Exception e){
+                        }
+                        catch (Exception e)
+                        {
                             GuiEngine.Current.log("Generic Exception Handler: " + " " + emote + " " + x[0] + " " + e.ToString());
                         }
                     }
@@ -507,7 +528,8 @@ namespace Chatterino.Common
                         Match m = Regex.Match(s, "([A-Za-z]+)([1-9][0-9]*)");
                         if (bits != null && m.Success)
                         {
-                            try {
+                            try
+                            {
                                 int cheer;
                                 string prefix = m.Groups[1].Value;
                                 string getcheer = m.Groups[2].Value;
@@ -518,10 +540,12 @@ namespace Chatterino.Common
                                     bool found = false;
                                     HSLColor bitsColor;
                                     LazyLoadedImage emote;
-                                    if (!(found = channel.GetCheerEmote(prefix, cheer, !GuiEngine.Current.IsDarkTheme, out emote, out color))) {
+                                    if (!(found = channel.GetCheerEmote(prefix, cheer, !GuiEngine.Current.IsDarkTheme, out emote, out color)))
+                                    {
                                         found = GuiEngine.Current.GetCheerEmote(prefix, cheer, !GuiEngine.Current.IsDarkTheme, out emote, out color);
                                     }
-                                    if (found) {
+                                    if (found)
+                                    {
                                         bitsColor = HSLColor.FromRGBHex(color);
                                         bitsLink = emote.Url;
 
@@ -530,7 +554,9 @@ namespace Chatterino.Common
                                         continue;
                                     }
                                 }
-                            } catch (Exception e) {
+                            }
+                            catch (Exception e)
+                            {
                                 GuiEngine.Current.log("Generic Exception Handler: " + e.ToString());
                             }
                         }
@@ -540,7 +566,8 @@ namespace Chatterino.Common
                             || (AppSettings.ChatEnableFfzEmotes && (channel.FfzChannelEmotes.TryGetValue(s, out thirdPartyEmote) || Emotes.FfzGlobalEmotes.TryGetValue(s, out thirdPartyEmote)))
                             || (AppSettings.ChatEnable7tvEmotes && (channel.SeventvChannelEmotes.TryGetValue(s, out thirdPartyEmote) || Emotes.SeventvGlobalEmotes.TryGetValue(s, out thirdPartyEmote)))))
                         {
-                            words.Add(new Word {
+                            words.Add(new Word
+                            {
                                 Type = SpanType.LazyLoadedImage,
                                 Value = thirdPartyEmote,
                                 Color = slashMe ? UsernameColor : new HSLColor?(),
@@ -601,21 +628,32 @@ namespace Chatterino.Common
 
             for (var w = 1; w < words.Count; w++) {
                 var curword = words[w];
-                if (curword.Type == SpanType.LazyLoadedImage) {
+                if (curword.Type == SpanType.LazyLoadedImage)
+                    {
                     int v = w - 1;
-                    if (EmoteModifiers.IsPreEmoteModifier(words[v].CopyText) && !curword.IsModifier && !curword.IsHat()) {
-                        for (int z = v; z >= 0; z--) {
-                            if (EmoteModifiers.IsPreEmoteModifier(words[z].CopyText)) {
+                    if (EmoteModifiers.IsPreEmoteModifier(words[v].CopyText) && !curword.IsModifier && !curword.IsHat())
+                        {
+                        for (int z = v; z >= 0; z--)
+                            {
+                            if (EmoteModifiers.IsPreEmoteModifier(words[z].CopyText))
+                                {
                                 curword.Modifiers.Add(words[z].CopyText);
                                 words[z].IsModifying = true;
-                            } else if (!words[z].IsHat()) {
+                            }
+                                else if (!words[z].IsHat())
+                                {
                                 break;
                             }
                         }
-                    } else if (EmoteModifiers.IsPostEmoteModifier(curword.CopyText)) {
-                        for (int z = v; z >= 0; z--) {
-                            if (!words[z].IsModifier && !words[z].IsHat()) {
-                                if (words[z].Type == SpanType.LazyLoadedImage) {
+                    }
+                        else if (EmoteModifiers.IsPostEmoteModifier(curword.CopyText))
+                        {
+                        for (int z = v; z >= 0; z--)
+                            {
+                            if (!words[z].IsModifier && !words[z].IsHat())
+                                {
+                                if (words[z].Type == SpanType.LazyLoadedImage)
+                                    {
                                     words[z].Modifiers.Add(curword.CopyText);
                                     curword.IsModifying = true;
                                 }
@@ -645,26 +683,32 @@ namespace Chatterino.Common
 
         }
 
-        public Message(string text, HSLColor? color, bool addTimeStamp, FontType fontType) {
+        public Message(string text, HSLColor? color, bool addTimeStamp, FontType fontType)
+        {
             ParseTime = DateTime.Now;
 
             RawMessage = text;
             Words = new List<Word>();
 
             // Add timestamp
-            if (addTimeStamp && AppSettings.ChatShowTimestamps) {
+            if (addTimeStamp && AppSettings.ChatShowTimestamps)
+            {
                 //var timestamp = DateTime.Now.ToString(AppSettings.ChatShowTimestampSeconds ? "HH:mm:ss" : "HH:mm");
                 string timestampFormat;
 
-                if (AppSettings.ChatShowTimestampSeconds) {
+                if (AppSettings.ChatShowTimestampSeconds)
+                {
                     timestampFormat = AppSettings.TimestampsAmPm ? "hh:mm:ss tt" : "HH:mm:ss";
-                } else {
+                }
+                else
+                {
                     timestampFormat = AppSettings.TimestampsAmPm ? "hh:mm tt" : "HH:mm";
                 }
 
                 string timestamp = ParseTime.ToString(timestampFormat, enUS);
 
-                Words.Add(new Word {
+                Words.Add(new Word
+                {
                     Type = SpanType.Text,
                     Value = timestamp,
                     Color = color ?? HSLColor.FromRGB(-8355712),
@@ -678,7 +722,7 @@ namespace Chatterino.Common
 
         public Message(string text, HSLColor? color, bool addTimeStamp) : this(text, color, addTimeStamp, FontType.Medium)
         {
-            
+
         }
 
         public Message(List<Word> words)
@@ -787,7 +831,7 @@ namespace Chatterino.Common
                         if (emotesChanged || _measureImages)
                         {
                             var emote = word.Value as LazyLoadedImage;
-                            
+
                             var image = emote?.Image;
                             if (image == null)
                             {
@@ -818,11 +862,13 @@ namespace Chatterino.Common
 
                                 word.Width = (int)w;
                                 word.Height = (int)h;
-                                if (word.IsModifying) {
+                                if (word.IsModifying)
+                                {
                                     word.Width = 0;
                                     word.Height = 0;
                                 }
-                                if (word.Modifiers.Count > 0 && !word.DoneModifying) {
+                                if (word.Modifiers.Count > 0 && !word.DoneModifying)
+                                {
                                     EmoteModifiers.ModifyWord(word);
                                     word.DoneModifying = true;
                                 }
@@ -898,21 +944,23 @@ namespace Chatterino.Common
 
                         if (img.IsHat)
                         {
-                            x -= Words[i-1].Width < word.Width ? Words[i-1].XOffset + Words[i-1].Width : Words[i-1].Width/2 + word.Width/2;
+                            x -= Words[i - 1].Width < word.Width ? Words[i - 1].XOffset + Words[i - 1].Width : Words[i - 1].Width / 2 + word.Width / 2;
                         }
                         else if (img.Margin != null)
                         {
                             margin = img.Margin;
                         }
-                    } else if (word.Type == SpanType.LazyLoadedImage 
-                        && enableHatEmotes 
-                        && i < (Words.Count - 1) 
-                        && Words[i + 1].IsHat()
-                        ) 
-                    {
-                        word.XOffset = Math.Max(Words[i+1].Width/2 - word.Width/2, 0);
                     }
-                    if (!enableHatEmotes || !word.IsHat()) {
+                    else if (word.Type == SpanType.LazyLoadedImage
+                        && enableHatEmotes
+                        && i < (Words.Count - 1)
+                        && Words[i + 1].IsHat()
+                        )
+                    {
+                        word.XOffset = Math.Max(Words[i + 1].Width / 2 - word.Width / 2, 0);
+                    }
+                    if (!enableHatEmotes || !word.IsHat())
+                    {
                         x += word.XOffset;
                     }
                     // word wrapped text
@@ -1321,26 +1369,110 @@ namespace Chatterino.Common
             return new Link(LinkType.Url, url);
         }
 
-        // Try to parse link from text, return null if no link was found, otherwise return the url parsed as a string
+
+        private const bool strictLinkReqs = true;
+
+        /// <summary>
+        /// Try to parse link from text, return null if no link was found, otherwise return the url parsed as a string.
+        /// Stricter requirements (protocol + domain) than previously.
+        /// </summary>
         private static string _matchLink(string text)
         {
             string link = null;
 
-            if (text.IndexOfAny(_linkIdentifiers) != -1)
+            if (strictLinkReqs)
             {
-                var m = _linkRegex.Match(text);
+                bool protocol = false;
+                bool dot = false;
+                int count = 0;
 
-                if (m.Success)
+                // totally unncessary 'optimization':
+                /*
+                unsafe
                 {
-                    link = m.Value;
-
-                    if (!m.Groups["Protocol"].Success)
-                        link = "http://" + link;
-
-                    if (!m.Groups["Protocol"].Success || m.Groups["Protocol"].Value.ToUpper() == "HTTP" || m.Groups["Protocol"].Value.ToUpper() == "HTTPS")
+                    fixed (char* pString = text)
                     {
-                        if (m.Groups["Domain"].Value.IndexOf('.') == -1)
-                            link = null;
+                        int strLength = text.Length;
+                        char* pChar = pString;
+                        for (int i = 0; i < strLength; i++)
+                        {
+                            var c = *pChar;
+                            if (c == '.')
+                            {
+                                count++;
+                                protocol = true;
+                            }
+                            else if (c == ':')
+                            {
+                                count++;
+                                dot = true;
+                            }
+                            pChar++;
+                        }
+                    }
+                }*/
+
+                // todo: use this instead, the compiler should handle it (even on NetFx48?):
+                foreach (char c in text)
+                {
+                    if (c == '.')
+                    {
+                        count++;
+                        protocol = true;
+                    }
+                    else if (c == ':')
+                    {
+                        count++;
+                        dot = true;
+                    }
+                    if (protocol && dot)
+                    {
+                        break;
+                    }
+                }
+
+                //if (count > 1)
+                if (protocol && dot)
+                {
+                    var m = _linkRegex.Match(text);
+
+                    if (m.Success)
+                    {
+                        link = m.Value;
+
+                        /* no longer needed
+                        if (!m.Groups["Protocol"].Success)
+                        {
+                            GuiEngine.Current.log("link proto bad - " + link);
+                            link = "http://" + link;
+                        }*/
+
+                        //if (!m.Groups["Protocol"].Success || m.Groups["Protocol"].Value.ToUpper() == "HTTP" || m.Groups["Protocol"].Value.ToUpper() == "HTTPS")
+                        {
+                            if (m.Groups["Domain"].Value.IndexOf('.') == -1)
+                                link = null;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (text.IndexOfAny(_linkIdentifiers) != -1)
+                {
+                    var m = _linkRegex.Match(text);
+
+                    if (m.Success)
+                    {
+                        link = m.Value;
+
+                        if (!m.Groups["Protocol"].Success)
+                            link = "http://" + link;
+
+                        if (!m.Groups["Protocol"].Success || m.Groups["Protocol"].Value.ToUpper() == "HTTP" || m.Groups["Protocol"].Value.ToUpper() == "HTTPS")
+                        {
+                            if (m.Groups["Domain"].Value.IndexOf('.') == -1)
+                                link = null;
+                        }
                     }
                 }
             }
