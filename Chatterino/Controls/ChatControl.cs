@@ -622,15 +622,22 @@ namespace Chatterino.Controls
                 }
                 else if (e.KeyChar == '\r' || e.KeyChar == '\n')
                 {
-                    CloseAutocomplete();
-                    if ((channel?.IsModOrBroadcaster ?? false) || messageSendCount == 0 || nextAutoMessageSendTime < DateTime.Now)
+                    if (AutoCompleteOpen)
                     {
-                        SendMessage((ModifierKeys & Keys.Control) != Keys.Control);
-
-                        nextAutoMessageSendTime = DateTime.Now.AddSeconds(1.6);
+                        SelectAutoComplete();
                     }
+                    else
+                    {
+                        CloseAutocomplete();
+                        if ((channel?.IsModOrBroadcaster ?? false) || messageSendCount == 0 || nextAutoMessageSendTime < DateTime.Now)
+                        {
+                            SendMessage((ModifierKeys & Keys.Control) != Keys.Control);
 
-                    messageSendCount++;
+                            nextAutoMessageSendTime = DateTime.Now.AddSeconds(1.6);
+                        }
+
+                        messageSendCount++;
+                    }
                 }
                 else if (e.KeyChar == '@' || e.KeyChar == ':')
                 {
